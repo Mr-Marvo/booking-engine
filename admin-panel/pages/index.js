@@ -38,9 +38,9 @@ export default function Dashboard() {
           { label: 'Active Listings', value: stats?.totalListings || 0, change: '↓ 2%', color: 'text-text', icon: '📑', neg: true },
           { label: 'Vendors', value: stats?.totalVendors || 12, change: '↑ 3 new', color: 'text-text', icon: '👥' },
         ].map((item, i) => (
-          <div key={i} className="card relative overflow-hidden p-5">
-            <h3 className="text-secondary text-[10px] md:text-xs font-semibold uppercase mb-2 tracking-wider">{item.label}</h3>
-            <p className={`text-2xl md:text-3xl font-bold ${item.color}`}>
+          <div key={i} className="card relative overflow-hidden p-5 bg-white dark:bg-slate-800">
+            <h3 className="text-secondary dark:text-gray-400 text-[10px] md:text-xs font-semibold uppercase mb-2 tracking-wider">{item.label}</h3>
+            <p className={`text-2xl md:text-3xl font-bold ${item.color} dark:text-white`}>
               {item.prefix}{item.value}
             </p>
             <p className={`text-[10px] md:text-xs mt-2 font-medium ${item.neg ? 'text-red-500' : 'text-green-500'}`}>

@@ -1,80 +1,101 @@
-const fs = require('fs');
-const path = require('path');
+const mongoose = require('mongoose');
 
-const listingsFilePath = path.join(__dirname, '../data/listings.json');
+// Base listing schema with discriminator key
+const baseOptions = {
+    discriminatorKey: 'type', // This field will store the listing type
+    collection: 'listings',
+    timestamps: true
+};
 
-// Ensure data directory exists
-if (!fs.existsSync(path.dirname(listingsFilePath))) {
-    fs.mkdirSync(path.dirname(listingsFilePath), { recursive: true });
-    fs.writeFileSync(listingsFilePath, '[]');
-}
-
-class Listing {
-    constructor(id, vendorId, title, description, type, price, location) {
-        this.id = id;
-        this.vendorId = vendorId;
-        this.title = title;
-        this.description = description;
-        this.type = type; // 'hotel', 'cinema', 'space', 'vehicle'
-        this.price = price;
-        this.location = location;
-        this.createdAt = new Date();
+const listingSchema = new mongoose.Schema({
+    vendorId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
+    title: {
+        type: String,
+        required: [true, 'Title is required'],
+        trim: true
+    },
+    description: {
+        type: String,
+        required: [true, 'Description is required']
+    },
+    price: {
+        type: Number,
+        required: [true, 'Price is required'],
+        min: 0
+    },
+    location: {
+        type: String,
+        required: [true, 'Location is required']
     }
+}, baseOptions);
 
-    static findAll() {
-        try {
-            const data = fs.readFileSync(listingsFilePath);
-            return JSON.parse(data);
-        } catch (err) {
-            return [];
-        }
-    }
+// Base Listing model
+const Listing = mongoose.model('Listing', listingSchema);
 
-    static findById(id) {
-        const listings = this.findAll();
-        return listings.find(l => l.id === id);
+// Hotel discriminator
+const HotelListing = Listing.discriminator('hotel', new mongoose.Schema({
+    roomType: {
+        type: String,
+        enum: ['single', 'double', 'king'],
+        required: true
+    },
+    amenities: {
+        type: [String],
+        default: []
     }
+}));
 
-    static create(listing) {
-        const listings = this.findAll();
-        listings.push(listing);
-        fs.writeFileSync(listingsFilePath, JSON.stringify(listings, null, 2));
-        return listing;
+// Cinema discriminator
+const CinemaListing = Listing.discriminator('cinema', new mongoose.Schema({
+    movieTitle: {
+        type: String,
+        required: true
+    },
+    showTime: {
+        type: Date,
+        required: true
+    },
+    seatLayout: {
+        rows: { type: Number, required: true },
+        cols: { type: Number, required: true },
+        aisles: { type: [Number], default: [] }
     }
-}
+}));
 
-class HotelListing extends Listing {
-    constructor(id, vendorId, title, description, price, location, roomType, amenities) {
-        super(id, vendorId, title, description, 'hotel', price, location);
-        this.roomType = roomType; // 'single', 'double', 'king'
-        this.amenities = amenities; // array
+// Space discriminator
+const SpaceListing = Listing.discriminator('space', new mongoose.Schema({
+    area: {
+        type: Number,
+        required: true,
+        min: 0
+    },
+    usageType: {
+        type: String,
+        enum: ['event', 'storage', 'office'],
+        required: true
     }
-}
+}));
 
-class CinemaListing extends Listing {
-    constructor(id, vendorId, title, description, price, location, movieTitle, showTime, seatLayout) {
-        super(id, vendorId, title, description, 'cinema', price, location);
-        this.movieTitle = movieTitle;
-        this.showTime = showTime;
-        this.seatLayout = seatLayout; // { rows: 10, cols: 10, aisles: [] }
+// Vehicle discriminator
+const VehicleListing = Listing.discriminator('vehicle', new mongoose.Schema({
+    vehicleType: {
+        type: String,
+        enum: ['car', 'van', 'bus'],
+        required: true
+    },
+    features: {
+        type: [String],
+        default: []
+    },
+    capacity: {
+        type: Number,
+        required: true,
+        min: 1
     }
-}
-
-class SpaceListing extends Listing {
-    constructor(id, vendorId, title, description, price, location, area, usageType) {
-        super(id, vendorId, title, description, 'space', price, location);
-        this.area = area; // sq ft
-        this.usageType = usageType; // 'event', 'storage', 'office'
-    }
-}
-
-class VehicleListing extends Listing {
-    constructor(id, vendorId, title, description, price, location, vehicleType, features, capacity) {
-        super(id, vendorId, title, description, 'vehicle', price, location);
-        this.vehicleType = vehicleType; // 'car', 'van', 'bus'
-        this.features = features;
-        this.capacity = capacity;
-    }
-}
+}));
 
 module.exports = { Listing, HotelListing, CinemaListing, SpaceListing, VehicleListing };

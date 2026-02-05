@@ -4,6 +4,8 @@ const bookingController = require('../controllers/bookingController');
 
 // TODO: Add authMiddleware
 router.post('/', bookingController.createBooking);
-router.get('/my-bookings', bookingController.getUserBookings);
+router.get('/user/:userId', bookingController.getUserBookings);
+router.get('/all', bookingController.getAllBookings);
+
 
 module.exports = router;

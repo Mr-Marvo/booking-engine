@@ -49,22 +49,30 @@ export default function StepListingSelection({ formData, updateFormData }) {
                         <p className="text-lg md:text-xl font-bold text-slate-400">No {formData.businessType}s found matching your criteria.</p>
                     </div>
                 ) : (
-                    listings.map(l => (
-                        <div
-                            key={l.id}
-                            onClick={() => updateFormData({ selectedListing: l })}
-                            className={`booking-option-card transform transition-all duration-300 p-5 md:p-6 ${formData.selectedListing?.id === l.id ? 'selected scale-[1.02] bg-blue-50/50' : 'hover:scale-[1.01] hover:bg-slate-50'}`}
-                        >
-                            <div className="flex flex-col gap-1 md:gap-2">
-                                <span className={`text-xl md:text-2xl font-black ${formData.selectedListing?.id === l.id ? 'text-blue-900' : 'text-slate-800'}`}>{l.title}</span>
-                                <span className="text-sm md:text-base text-slate-500 flex items-center gap-1 font-semibold">📍 {l.location}</span>
+                    listings.map(l => {
+                        const listingId = l._id || l.id;
+                        const selectedId = formData.selectedListing?._id || formData.selectedListing?.id;
+                        const isSelected = selectedId && listingId && selectedId === listingId;
+
+                        return (
+                            <div
+                                key={listingId}
+                                onClick={() => updateFormData({ selectedListing: l })}
+                                className={`booking-option-card transform transition-all duration-300 p-5 md:p-6 ${isSelected ? 'selected scale-[1.02] bg-blue-50/50' : 'hover:scale-[1.01] hover:bg-slate-50'}`}
+                            >
+                                <div className="flex flex-col gap-1 md:gap-2">
+                                    <span className={`text-xl md:text-2xl font-black ${isSelected ? 'text-blue-900' : 'text-slate-800'}`}>{l.title}</span>
+                                    <span className="text-sm md:text-base text-slate-500 flex items-center gap-1 font-semibold">📍 {l.location}</span>
+                                </div>
+
+
+                                <div className="text-right">
+                                    <span className="block font-black text-2xl md:text-3xl text-blue-600">${l.price}</span>
+                                    <span className="text-[10px] md:text-sm text-slate-400 uppercase font-black tracking-tighter">Per {formData.businessType === 'hotel' || formData.businessType === 'hostel' ? 'Night' : 'Session'}</span>
+                                </div>
                             </div>
-                            <div className="text-right">
-                                <span className="block font-black text-2xl md:text-3xl text-blue-600">${l.price}</span>
-                                <span className="text-[10px] md:text-sm text-slate-400 uppercase font-black tracking-tighter">Per {formData.businessType === 'hotel' || formData.businessType === 'hostel' ? 'Night' : 'Session'}</span>
-                            </div>
-                        </div>
-                    ))
+                        );
+                    })
                 )}
             </div>
         </div>

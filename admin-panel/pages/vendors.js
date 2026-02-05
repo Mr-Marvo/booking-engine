@@ -68,7 +68,7 @@ export default function Vendors() {
                 <div className="overflow-x-auto">
                     <table className="w-full border-collapse min-w-[800px]">
                         <thead>
-                            <tr className="border-b-2 border-border text-left text-secondary text-xs uppercase bg-slate-50">
+                            <tr className="border-b-1 border-gray-500 text-left text-secondary text-xs uppercase">
                                 <th className="p-4 font-semibold">Vendor Details</th>
                                 <th className="p-4 font-semibold">Type</th>
                                 <th className="p-4 font-semibold">Member Since</th>

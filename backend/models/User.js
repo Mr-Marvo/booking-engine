@@ -1,46 +1,49 @@
-const fs = require('fs');
-const path = require('path');
+const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 
-// Simple file-based mock DB for now to avoid external DB setup complexity initially
-// In a real app, this would be Mongoose or Sequelize
-const usersFilePath = path.join(__dirname, '../data/users.json');
-
-// Ensure data directory exists
-if (!fs.existsSync(path.dirname(usersFilePath))) {
-    fs.mkdirSync(path.dirname(usersFilePath), { recursive: true });
-    fs.writeFileSync(usersFilePath, '[]');
-}
-
-class User {
-    constructor(id, name, email, password, role) {
-        this.id = id;
-        this.name = name;
-        this.email = email;
-        this.password = password;
-        this.role = role; // 'user', 'vendor', 'admin'
+const userSchema = new mongoose.Schema({
+    name: {
+        type: String,
+        required: [true, 'Name is required'],
+        trim: true
+    },
+    email: {
+        type: String,
+        required: [true, 'Email is required'],
+        unique: true,
+        lowercase: true,
+        trim: true
+    },
+    password: {
+        type: String,
+        required: [true, 'Password is required'],
+        minlength: 6
+    },
+    role: {
+        type: String,
+        enum: ['user', 'vendor', 'admin'],
+        default: 'user'
     }
+}, {
+    timestamps: true // Adds createdAt and updatedAt automatically
+});
 
-    static findAll() {
-        const data = fs.readFileSync(usersFilePath);
-        return JSON.parse(data);
+// Hash password before saving
+userSchema.pre('save', async function () {
+    if (!this.isModified('password')) return;
+
+    try {
+        const salt = await bcrypt.genSalt(10);
+        this.password = await bcrypt.hash(this.password, salt);
+    } catch (error) {
+        throw error;
     }
+});
 
-    static findByEmail(email) {
-        const users = this.findAll();
-        return users.find(u => u.email === email);
-    }
 
-    static findById(id) {
-        const users = this.findAll();
-        return users.find(u => u.id === id);
-    }
+// Method to compare passwords
+userSchema.methods.comparePassword = async function (candidatePassword) {
+    return await bcrypt.compare(candidatePassword, this.password);
+};
 
-    static create(user) {
-        const users = this.findAll();
-        users.push(user);
-        fs.writeFileSync(usersFilePath, JSON.stringify(users, null, 2));
-        return user;
-    }
-}
-
-module.exports = User;
+module.exports = mongoose.model('User', userSchema);

@@ -4,16 +4,20 @@
   --color-primary: #0f172a;
   --color-secondary: #64748b;
   --color-accent: #3b82f6;
-  --color-background: #f1f5f9;
+  --color-background: #ffffff;
   --color-surface: #ffffff;
-  --color-text: #1e293b;
+  --color-text: #0f172a;
   --color-border: #e2e8f0;
   --radius-md: 0.375rem;
 }
 
 @layer base {
   body {
-    @apply bg-background text-text font-sans;
+    @apply bg-white text-slate-900 font-sans transition-colors duration-300;
+  }
+
+  html.dark body {
+    @apply bg-slate-900 text-white;
   }
 }
 
@@ -27,6 +31,10 @@
   }
 
   .card {
-    @apply bg-surface rounded-md p-6 border border-border shadow-sm;
+    @apply bg-white rounded-md p-6 border border-gray-200 shadow-sm transition-colors duration-300;
+  }
+
+  html.dark .card {
+    @apply bg-slate-800 border-slate-700 text-white;
   }
 }

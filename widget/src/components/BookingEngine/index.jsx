@@ -87,14 +87,42 @@ export default function BookingEngine() {
     const handleConfirm = async () => {
         if (step === 5) {
             try {
-                // In a real app, this would initiate the payment gateway
+                // Ensure we have a user for the booking (simplified for widget)
+                // In a real flow, you'd check if customer already exists or create new one
+                const customerRes = await axios.post(`${API_BASE}/auth/signup`, {
+                    name: formData.name || 'Guest User',
+                    email: formData.email || `guest_${Date.now()}@example.com`,
+                    password: 'temporaryPassword123!',
+                    role: 'user'
+                }).catch(err => {
+                    // If user exists, try to login or use existing
+                    if (err.response?.status === 400) {
+                        return axios.post(`${API_BASE}/auth/login`, {
+                            email: formData.email,
+                            password: 'temporaryPassword123!'
+                        });
+                    }
+                    throw err;
+                });
+
+                const userObj = customerRes.data.user;
+                const userId = userObj?._id || userObj?.id;
+
+                const selectedListing = formData.selectedListing;
+                const listingId = selectedListing?._id || selectedListing?.id;
+
+                if (!userId || !listingId) {
+                    throw new Error(`Missing IDs: User(${userId}), Listing(${listingId})`);
+                }
+
                 await axios.post(`${API_BASE}/bookings`, {
-                    listingId: formData.selectedListing.id,
+                    listingId: listingId,
+                    userId: userId,
                     details: {
                         ...formData.bookingDetails,
                         paymentMethod: formData.paymentMethod || 'card'
                     },
-                    totalPrice: formData.selectedListing.price
+                    totalPrice: selectedListing.price
                 });
                 nextStep();
             } catch (err) {
@@ -105,6 +133,7 @@ export default function BookingEngine() {
             nextStep();
         }
     };
+
 
     return (
         <div className="booking-engine-container">

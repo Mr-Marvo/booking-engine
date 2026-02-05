@@ -1,43 +1,36 @@
-const fs = require('fs');
-const path = require('path');
+const mongoose = require('mongoose');
 
-const bookingsFilePath = path.join(__dirname, '../data/bookings.json');
-
-if (!fs.existsSync(path.dirname(bookingsFilePath))) {
-    fs.mkdirSync(path.dirname(bookingsFilePath), { recursive: true });
-    fs.writeFileSync(bookingsFilePath, '[]');
-}
-
-class Booking {
-    constructor(id, userId, listingId, details, status, totalPrice) {
-        this.id = id;
-        this.userId = userId;
-        this.listingId = listingId;
-        this.details = details; // { date: '...', seatNumbers: [], etc. }
-        this.status = status; // 'confirmed', 'pending', 'cancelled'
-        this.totalPrice = totalPrice;
-        this.createdAt = new Date();
+const bookingSchema = new mongoose.Schema({
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
+    listingId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Listing',
+        required: true
+    },
+    details: {
+        type: mongoose.Schema.Types.Mixed, // Flexible field for different booking types
+        default: {}
+    },
+    status: {
+        type: String,
+        enum: ['confirmed', 'pending', 'cancelled'],
+        default: 'pending'
+    },
+    totalPrice: {
+        type: Number,
+        required: [true, 'Total price is required'],
+        min: 0
     }
+}, {
+    timestamps: true
+});
 
-    static findAll() {
-        try {
-            const data = fs.readFileSync(bookingsFilePath);
-            return JSON.parse(data);
-        } catch (err) {
-            return [];
-        }
-    }
+// Index for faster queries
+bookingSchema.index({ userId: 1, createdAt: -1 });
+bookingSchema.index({ listingId: 1 });
 
-    static findById(id) {
-        return this.findAll().find(b => b.id === id);
-    }
-
-    static create(booking) {
-        const bookings = this.findAll();
-        bookings.push(booking);
-        fs.writeFileSync(bookingsFilePath, JSON.stringify(bookings, null, 2));
-        return booking;
-    }
-}
-
-module.exports = Booking;
+module.exports = mongoose.model('Booking', bookingSchema);
