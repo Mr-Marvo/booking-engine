@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import AdminLayout from '../components/AdminLayout';
 
+const API_BASE = 'http://localhost:5000/api';
+
 export default function Reports() {
     const [reportType, setReportType] = useState('revenue');
     const [dateRange, setDateRange] = useState('last-30');
@@ -14,13 +16,14 @@ export default function Reports() {
     ];
 
     const handleGenerate = () => {
-        alert(`Generating ${reportType} report for ${dateRange}...`);
+        const downloadUrl = `${API_BASE}/admin/export-report?type=${reportType}&range=${dateRange}`;
+        window.location.href = downloadUrl;
     };
 
     return (
         <AdminLayout>
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
-                <h1 className="text-2xl md:text-3xl font-bold">Analytics & Reports</h1>
+                <h1 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">Analytics & Reports</h1>
                 <button
                     onClick={handleGenerate}
                     className="btn btn-accent px-6 py-2 w-full sm:w-auto"
@@ -32,9 +35,9 @@ export default function Reports() {
             {/* Filters Section */}
             <div className="card p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
                 <div className="flex flex-col gap-2">
-                    <label className="text-sm font-semibold">Report Type</label>
+                    <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Report Type</label>
                     <select
-                        className="w-full p-2.5 rounded-md border border-border bg-white focus:outline-none focus:ring-2 focus:ring-accent"
+                        className="w-full p-2.5 rounded-md border border-border dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-accent"
                         value={reportType}
                         onChange={(e) => setReportType(e.target.value)}
                     >
@@ -45,9 +48,9 @@ export default function Reports() {
                     </select>
                 </div>
                 <div className="flex flex-col gap-2">
-                    <label className="text-sm font-semibold">Date Range</label>
+                    <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Date Range</label>
                     <select
-                        className="w-full p-2.5 rounded-md border border-border bg-white focus:outline-none focus:ring-2 focus:ring-accent"
+                        className="w-full p-2.5 rounded-md border border-border dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-accent"
                         value={dateRange}
                         onChange={(e) => setDateRange(e.target.value)}
                     >
@@ -58,8 +61,8 @@ export default function Reports() {
                     </select>
                 </div>
                 <div className="flex flex-col gap-2 sm:col-span-2 lg:col-span-1">
-                    <label className="text-sm font-semibold">Export Format</label>
-                    <select className="w-full p-2.5 rounded-md border border-border bg-white focus:outline-none focus:ring-2 focus:ring-accent">
+                    <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Export Format</label>
+                    <select className="w-full p-2.5 rounded-md border border-border dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-accent">
                         <option value="pdf">PDF Document</option>
                         <option value="csv">CSV Spreadsheet</option>
                         <option value="excel">Excel Worksheet</option>
@@ -70,28 +73,28 @@ export default function Reports() {
             {/* Stats Overview */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
                 {[
-                    { label: 'Total Sales', value: '$12,450.00', change: '↑ 12%', color: 'border-accent', text: 'text-green-600' },
-                    { label: 'Active Bookings', value: '84', change: '↑ 5%', color: 'border-amber-500', text: 'text-green-600' },
-                    { label: 'Avg. Order Value', value: '$148.20', change: 'Steady', color: 'border-red-500', text: 'text-slate-500' },
+                    { label: 'Total Sales', value: '$12,450.00', change: '↑ 12%', color: 'border-accent', text: 'text-green-600 dark:text-green-400' },
+                    { label: 'Active Bookings', value: '84', change: '↑ 5%', color: 'border-amber-500', text: 'text-green-600 dark:text-green-400' },
+                    { label: 'Avg. Order Value', value: '$148.20', change: 'Steady', color: 'border-red-500', text: 'text-slate-500 dark:text-slate-400' },
                 ].map((stat, i) => (
-                    <div key={i} className={`card p-6 border-l-4 ${stat.color}`}>
-                        <h3 className="text-secondary text-[10px] md:text-xs uppercase font-semibold mb-2">{stat.label}</h3>
-                        <p className="text-xl md:text-2xl font-bold">{stat.value}</p>
+                    <div key={i} className={`card p-6 border-l-4 ${stat.color} bg-white dark:bg-slate-800`}>
+                        <h3 className="text-secondary dark:text-slate-400 text-[10px] md:text-xs uppercase font-semibold mb-2">{stat.label}</h3>
+                        <p className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white">{stat.value}</p>
                         <p className={`${stat.text} text-[10px] md:text-xs mt-2 font-medium`}>{stat.change} growth</p>
                     </div>
                 ))}
             </div>
 
             {/* Report Data Table */}
-            <div className="card !p-0 overflow-hidden">
-                <div className="p-4 md:p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-border">
-                    <h2 className="text-lg font-semibold">Recent Transaction Log</h2>
-                    <span className="text-xs text-secondary font-medium">Showing {mockReportData.length} records</span>
+            <div className="card p-0! overflow-hidden">
+                <div className="p-4 md:p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-border dark:border-slate-700">
+                    <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Recent Transaction Log</h2>
+                    <span className="text-xs text-secondary dark:text-slate-400 font-medium">Showing {mockReportData.length} records</span>
                 </div>
                 <div className="overflow-x-auto">
                     <table className="w-full border-collapse min-w-[600px]">
                         <thead>
-                            <tr className="border-b border-border text-left bg-slate-50 text-[10px] md:text-xs uppercase text-secondary">
+                            <tr className="border-b border-border dark:border-slate-700 text-left bg-slate-50 dark:bg-slate-900/50 text-[10px] md:text-xs uppercase text-secondary dark:text-slate-400">
                                 <th className="p-4 font-bold">Date</th>
                                 <th className="p-4 font-bold">Description</th>
                                 <th className="p-4 font-bold">Amount</th>
@@ -100,12 +103,12 @@ export default function Reports() {
                         </thead>
                         <tbody>
                             {mockReportData.map(item => (
-                                <tr key={item.id} className="border-b border-border hover:bg-slate-50 transition-colors">
-                                    <td className="p-4 text-xs md:text-sm">{item.date}</td>
-                                    <td className="p-4 text-xs md:text-sm font-medium">{item.description}</td>
-                                    <td className="p-4 text-xs md:text-sm font-bold">${item.amount.toFixed(2)}</td>
+                                <tr key={item.id} className="border-b border-border dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                                    <td className="p-4 text-xs md:text-sm text-slate-600 dark:text-slate-300">{item.date}</td>
+                                    <td className="p-4 text-xs md:text-sm font-medium text-slate-900 dark:text-white">{item.description}</td>
+                                    <td className="p-4 text-xs md:text-sm font-bold text-slate-900 dark:text-white">${item.amount.toFixed(2)}</td>
                                     <td className="p-4">
-                                        <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${item.status === 'Completed' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'
+                                        <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${item.status === 'Completed' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
                                             }`}>
                                             {item.status}
                                         </span>

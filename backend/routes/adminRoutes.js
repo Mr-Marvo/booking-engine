@@ -6,5 +6,6 @@ const adminController = require('../controllers/adminController');
 router.get('/vendors', adminController.getAllVendors);
 router.post('/vendors/approve', adminController.approveVendor);
 router.get('/reports', adminController.getReports);
+router.get('/export-report', adminController.exportReport);
 
 module.exports = router;

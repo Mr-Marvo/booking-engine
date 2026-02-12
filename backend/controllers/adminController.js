@@ -70,6 +70,29 @@ exports.getReports = async (req, res) => {
             vehicle: listings.filter(l => l.type === 'vehicle').length
         };
 
+        // Monthly revenue for the last 6 months
+        const monthlyRevenue = [];
+        const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+        for (let i = 5; i >= 0; i--) {
+            const date = new Date();
+            date.setMonth(date.getMonth() - i);
+            const month = date.getMonth();
+            const year = date.getFullYear();
+
+            const revenue = bookings
+                .filter(b => {
+                    const bDate = new Date(b.createdAt);
+                    return bDate.getMonth() === month && bDate.getFullYear() === year;
+                })
+                .reduce((sum, b) => sum + (b.totalPrice || 0), 0);
+
+            monthlyRevenue.push({
+                name: monthNames[month],
+                revenue: revenue
+            });
+        }
+
         res.status(200).json({
             totalRevenue,
             totalBookings,
@@ -80,10 +103,60 @@ exports.getReports = async (req, res) => {
                 pending: pendingBookings,
                 cancelled: cancelledBookings
             },
-            listingsByType
+            listingsByType,
+            monthlyRevenue
         });
     } catch (error) {
         console.error('Get reports error:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
+exports.exportReport = async (req, res) => {
+    try {
+        const { type, range } = req.query;
+
+        let query = {};
+        const now = new Date();
+        if (range === 'today') {
+            const startOfDay = new Date(now.setHours(0, 0, 0, 0));
+            query.createdAt = { $gte: startOfDay };
+        } else if (range === 'last-7') {
+            const sevenDaysAgo = new Date();
+            sevenDaysAgo.setDate(now.getDate() - 7);
+            query.createdAt = { $gte: sevenDaysAgo };
+        } else if (range === 'last-30') {
+            const thirtyDaysAgo = new Date();
+            thirtyDaysAgo.setDate(now.getDate() - 30);
+            query.createdAt = { $gte: thirtyDaysAgo };
+        }
+
+        const bookings = await Booking.find(query)
+            .populate('userId', 'name email')
+            .populate('listingId', 'title type');
+
+        // CSV Header
+        let csvContent = "Booking ID,Date,Customer,Email,Listing,Type,Amount,Status\n";
+
+        // CSV Rows
+        bookings.forEach(b => {
+            const date = b.createdAt ? b.createdAt.toISOString().split('T')[0] : 'N/A';
+            const customer = b.userId ? b.userId.name : 'N/A';
+            const email = b.userId ? b.userId.email : 'N/A';
+            const listing = b.listingId ? b.listingId.title : 'N/A';
+            const listingType = b.listingId ? b.listingId.type : 'N/A';
+            const amount = b.totalPrice || 0;
+            const status = b.status || 'pending';
+
+            csvContent += `${b._id},${date},"${customer}","${email}","${listing}",${listingType},${amount},${status}\n`;
+        });
+
+        res.setHeader('Content-Type', 'text/csv');
+        res.setHeader('Content-Disposition', `attachment; filename=bookings-report-${range}.csv`);
+        res.status(200).send(csvContent);
+
+    } catch (error) {
+        console.error('Export report error:', error);
         res.status(500).json({ message: 'Server error' });
     }
 };

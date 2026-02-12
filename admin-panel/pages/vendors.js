@@ -51,12 +51,12 @@ export default function Vendors() {
     return (
         <AdminLayout>
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
-                <h1 className="text-2xl md:text-3xl font-bold">Vendor Management</h1>
+                <h1 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">Vendor Management</h1>
                 <div className="relative w-full sm:w-[300px]">
                     <input
                         type="text"
                         placeholder="Search vendors..."
-                        className="w-full pl-10 pr-4 py-2 rounded-md border border-border focus:outline-none focus:ring-2 focus:ring-accent"
+                        className="w-full pl-10 pr-4 py-2 rounded-md border border-border dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-accent"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
@@ -68,7 +68,7 @@ export default function Vendors() {
                 <div className="overflow-x-auto">
                     <table className="w-full border-collapse min-w-[800px]">
                         <thead>
-                            <tr className="border-b-1 border-gray-500 text-left text-secondary text-xs uppercase">
+                            <tr className="border-b-1 border-gray-500 dark:border-slate-700 text-left text-secondary dark:text-slate-400 text-xs uppercase">
                                 <th className="p-4 font-semibold">Vendor Details</th>
                                 <th className="p-4 font-semibold">Type</th>
                                 <th className="p-4 font-semibold">Member Since</th>
@@ -78,17 +78,17 @@ export default function Vendors() {
                         </thead>
                         <tbody>
                             {filteredVendors.map(vendor => (
-                                <tr key={vendor.id} className="border-b border-border hover:bg-slate-50 transition-colors">
+                                <tr key={vendor.id} className="border-b border-border dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
                                     <td className="p-4">
-                                        <div className="font-semibold text-sm">{vendor.name}</div>
-                                        <div className="text-xs text-secondary">{vendor.email}</div>
+                                        <div className="font-semibold text-sm text-slate-900 dark:text-white">{vendor.name}</div>
+                                        <div className="text-xs text-secondary dark:text-slate-400">{vendor.email}</div>
                                     </td>
-                                    <td className="p-4 text-sm">{vendor.type}</td>
-                                    <td className="p-4 text-sm text-secondary">{vendor.joined}</td>
+                                    <td className="p-4 text-sm text-slate-600 dark:text-slate-300">{vendor.type}</td>
+                                    <td className="p-4 text-sm text-secondary dark:text-slate-400">{vendor.joined}</td>
                                     <td className="p-4">
                                         <span className={`px-3 py-1 rounded-full text-[11px] font-bold capitalize ${vendor.status === 'active'
-                                            ? 'bg-green-100 text-green-800'
-                                            : 'bg-amber-100 text-amber-800'
+                                            ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
+                                            : 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400'
                                             }`}>
                                             {vendor.status}
                                         </span>
@@ -100,10 +100,10 @@ export default function Vendors() {
                                                     Approve
                                                 </button>
                                             )}
-                                            <button onClick={() => handleAction(vendor.id, 'suspend')} className="btn bg-white border border-border px-3 py-1 text-xs hover:bg-gray-50">
+                                            <button onClick={() => handleAction(vendor.id, 'suspend')} className="btn bg-white dark:bg-slate-800 border border-border dark:border-slate-700 text-slate-700 dark:text-slate-300 px-3 py-1 text-xs hover:bg-gray-50 dark:hover:bg-slate-700">
                                                 Suspend
                                             </button>
-                                            <button onClick={() => handleAction(vendor.id, 'delete')} className="btn bg-white border border-red-100 text-red-500 px-3 py-1 text-xs hover:bg-red-50">
+                                            <button onClick={() => handleAction(vendor.id, 'delete')} className="btn bg-white dark:bg-slate-800 border border-red-100 dark:border-red-900 text-red-500 dark:text-red-400 px-3 py-1 text-xs hover:bg-red-50 dark:hover:bg-red-900/20">
                                                 Delete
                                             </button>
                                         </div>

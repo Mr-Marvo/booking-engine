@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import AdminLayout from '../components/AdminLayout';
+import GrowthChart from '../components/GrowthChart';
 
 const API_BASE = 'http://localhost:5000/api';
 
@@ -23,9 +24,9 @@ export default function Dashboard() {
   return (
     <AdminLayout>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
-        <h1 className="text-2xl md:text-3xl font-bold">Dashboard Overview</h1>
+        <h1 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">Dashboard Overview</h1>
         <div className="flex flex-wrap gap-2 md:gap-4 w-full sm:w-auto">
-          <button className="btn bg-white border border-border text-sm px-3 py-2 flex-1 sm:flex-none">Last 7 Days</button>
+          <button className="btn bg-white dark:bg-slate-800 border border-border dark:border-slate-700 text-slate-900 dark:text-white text-sm px-3 py-2 flex-1 sm:flex-none">Last 7 Days</button>
           <button className="btn btn-accent text-sm px-3 py-2 flex-1 sm:flex-none">Download Report</button>
         </div>
       </div>
@@ -55,25 +56,26 @@ export default function Dashboard() {
         {/* Performance Section */}
         <div className="card lg:col-span-2 p-6">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-6">
-            <h2 className="text-lg md:text-xl font-semibold">Platform Growth</h2>
+            <h2 className="text-lg md:text-xl font-semibold text-slate-900 dark:text-white">Platform Growth</h2>
             <Link href="/reports" className="text-xs md:text-sm text-accent hover:underline">View Detailed Reports →</Link>
           </div>
-          <div className="h-[200px] md:h-[300px] bg-slate-50 rounded-md flex items-center justify-center border border-dashed border-border p-4 text-center">
-            <p className="text-secondary text-sm">Chart Visualization Area (Revenue vs Time)</p>
+          <div className="w-full h-[300px]">
+            <GrowthChart data={stats?.monthlyRevenue} />
           </div>
         </div>
 
         {/* Activity Feed */}
         <div className="card p-6">
-          <h2 className="text-lg md:text-xl font-semibold mb-6">Recent Activity</h2>
+          <h2 className="text-lg md:text-xl font-semibold mb-6 text-slate-900 dark:text-white">Recent Activity</h2>
           <div className="flex flex-col gap-4">
             {[
               { text: 'New vendor "Oceanic Stays" registered', time: '10 mins ago', icon: '👤' },
               { text: 'Booking #842 completed by User42', time: '2 hours ago', icon: '✅' },
               { text: 'New listing "Mountain Cabin" pending approval', time: '5 hours ago', icon: '🔔' },
               { text: 'Payout of $4,200 processed to VendorX', time: '1 day ago', icon: '💸' },
+              {/* ... */ }
             ].map((activity, i) => (
-              <div key={i} className={`flex gap-4 pb-4 ${i < 3 ? 'border-b border-border' : ''}`}>
+              <div key={i} className={`flex gap-4 pb-4 ${i < 3 ? 'border-b border-border dark:border-slate-700' : ''}`}>
                 <div className="text-xl shrink-0">{activity.icon}</div>
                 <div className="min-w-0">
                   <p className="m-0 text-xs md:text-sm font-medium truncate">{activity.text}</p>

@@ -73,31 +73,33 @@ export default function Header({ toggleSidebar }) {
                                         </Link>
                                     </div>
 
-                                    <div className="py-1 px-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-slate-700 cursor-pointer" onClick={toggleTheme}>
-                                        <div className="flex items-center">
-                                            {theme === 'dark' ? (
-                                                <Moon className="mr-3 h-5 w-5 text-gray-400" />
-                                            ) : (
-                                                <Sun className="mr-3 h-5 w-5 text-gray-400" />
-                                            )}
-                                            <span className="text-sm text-gray-700 dark:text-gray-200">
-                                                {theme === 'dark' ? 'Dark Mode' : 'Light Mode'}
-                                            </span>
+                                    <Switch.Group>
+                                        <div className="py-1 px-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-slate-700 cursor-pointer">
+                                            <Switch.Label className="flex items-center flex-1 cursor-pointer">
+                                                {theme === 'dark' ? (
+                                                    <Moon className="mr-3 h-5 w-5 text-gray-400" />
+                                                ) : (
+                                                    <Sun className="mr-3 h-5 w-5 text-gray-400" />
+                                                )}
+                                                <span className="text-sm text-gray-700 dark:text-gray-200">
+                                                    {theme === 'dark' ? 'Dark Mode' : 'Light Mode'}
+                                                </span>
+                                            </Switch.Label>
+                                            <Switch
+                                                checked={theme === 'dark'}
+                                                onChange={toggleTheme}
+                                                className={`${theme === 'dark' ? 'bg-blue-600' : 'bg-gray-200'}
+                                                    relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
+                                            >
+                                                <span className="sr-only">Use setting</span>
+                                                <span
+                                                    aria-hidden="true"
+                                                    className={`${theme === 'dark' ? 'translate-x-5' : 'translate-x-0'}
+                                                        pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out`}
+                                                />
+                                            </Switch>
                                         </div>
-                                        <Switch
-                                            checked={theme === 'dark'}
-                                            onChange={toggleTheme}
-                                            className={`${theme === 'dark' ? 'bg-blue-600' : 'bg-gray-200'}
-                                                relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
-                                        >
-                                            <span className="sr-only">Use setting</span>
-                                            <span
-                                                aria-hidden="true"
-                                                className={`${theme === 'dark' ? 'translate-x-5' : 'translate-x-0'}
-                                                    pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out`}
-                                            />
-                                        </Switch>
-                                    </div>
+                                    </Switch.Group>
 
                                     <div className="py-1 border-t border-gray-200 dark:border-slate-700">
                                         <button
