@@ -14,8 +14,9 @@ export default function StepListingSelection({ formData, updateFormData }) {
     const fetchListings = async () => {
         try {
             const res = await axios.get(`${API_BASE}/listings`);
+            const allListings = res.data.listings || [];
             // Filter by selected business type
-            const filtered = res.data.filter(l => l.type === formData.businessType);
+            const filtered = allListings.filter(l => l.type === formData.businessType);
             setListings(filtered);
         } catch (err) {
             console.error(err);

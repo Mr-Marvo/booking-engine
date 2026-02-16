@@ -85,16 +85,7 @@ export default function Signup() {
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-semibold text-slate-700 mb-1">Role</label>
-                            <select
-                                name="role"
-                                className="appearance-none relative block w-full px-4 py-3 border border-border bg-white text-slate-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all"
-                                value={formData.role}
-                                onChange={handleChange}
-                            >
-                                <option value="vendor">Vendor</option>
-                                <option value="admin">System Admin</option>
-                            </select>
+                            <input type="hidden" name="role" value="vendor" />
                         </div>
                     </div>
 

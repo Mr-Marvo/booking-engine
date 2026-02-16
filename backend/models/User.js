@@ -23,6 +23,11 @@ const userSchema = new mongoose.Schema({
         type: String,
         enum: ['user', 'vendor', 'admin'],
         default: 'user'
+    },
+    status: {
+        type: String,
+        enum: ['active', 'pending', 'suspended'],
+        default: 'pending'
     }
 }, {
     timestamps: true // Adds createdAt and updatedAt automatically

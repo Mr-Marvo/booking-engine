@@ -87,14 +87,19 @@ export default function BookingEngine() {
     const handleConfirm = async () => {
         if (step === 5) {
             try {
+                console.log('[Widget] Starting booking process...');
+                console.log('[Widget] Form data:', formData);
+
                 // Ensure we have a user for the booking (simplified for widget)
                 // In a real flow, you'd check if customer already exists or create new one
+                console.log('[Widget] Creating/logging in user...');
                 const customerRes = await axios.post(`${API_BASE}/auth/signup`, {
                     name: formData.name || 'Guest User',
                     email: formData.email || `guest_${Date.now()}@example.com`,
                     password: 'temporaryPassword123!',
                     role: 'user'
                 }).catch(err => {
+                    console.log('[Widget] Signup failed, trying login...', err.response?.data);
                     // If user exists, try to login or use existing
                     if (err.response?.status === 400) {
                         return axios.post(`${API_BASE}/auth/login`, {
@@ -107,15 +112,24 @@ export default function BookingEngine() {
 
                 const userObj = customerRes.data.user;
                 const userId = userObj?._id || userObj?.id;
+                const token = customerRes.data.token; // Extract token
+                console.log('[Widget] User ID:', userId);
+                console.log('[Widget] Token:', token ? 'Received' : 'Missing');
 
                 const selectedListing = formData.selectedListing;
                 const listingId = selectedListing?._id || selectedListing?.id;
+                console.log('[Widget] Listing ID:', listingId);
 
                 if (!userId || !listingId) {
                     throw new Error(`Missing IDs: User(${userId}), Listing(${listingId})`);
                 }
 
-                await axios.post(`${API_BASE}/bookings`, {
+                if (!token) {
+                    throw new Error('Authentication token missing');
+                }
+
+                console.log('[Widget] Creating booking...');
+                const bookingRes = await axios.post(`${API_BASE}/bookings`, {
                     listingId: listingId,
                     userId: userId,
                     details: {
@@ -123,11 +137,20 @@ export default function BookingEngine() {
                         paymentMethod: formData.paymentMethod || 'card'
                     },
                     totalPrice: selectedListing.price
+                }, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
                 });
+
+                console.log('[Widget] Booking created:', bookingRes.data);
                 nextStep();
             } catch (err) {
-                alert('Payment/Booking failed. Please try again.');
-                console.error(err);
+                console.error('[Widget] Booking error:', err);
+                console.error('[Widget] Error response:', err.response?.data);
+
+                const errorMessage = err.response?.data?.message || err.message || 'Unknown error';
+                alert(`Payment/Booking failed: ${errorMessage}`);
             }
         } else {
             nextStep();

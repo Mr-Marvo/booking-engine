@@ -72,11 +72,17 @@ export default function Login() {
                         </button>
                     </div>
 
-                    <div className="text-center">
+                    <div className="text-center space-y-2">
                         <p className="text-sm text-slate-600 font-medium">
                             Don't have an account?{' '}
                             <Link href="/auth/signup" className="text-blue-600 font-bold hover:underline">
                                 Register as Vendor
+                            </Link>
+                        </p>
+                        <p className="text-xs text-slate-500">
+                            Are you an Administrator?{' '}
+                            <Link href="/auth/admin/login" className="text-slate-700 font-bold hover:underline">
+                                Login here
                             </Link>
                         </p>
                     </div>

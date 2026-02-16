@@ -1,4 +1,5 @@
 const { Listing, HotelListing, CinemaListing, SpaceListing, VehicleListing } = require('../models/Listing');
+const Notification = require('../models/Notification');
 
 exports.createListing = async (req, res) => {
     try {
@@ -60,6 +61,21 @@ exports.createListing = async (req, res) => {
         }
 
         await newListing.save();
+
+        // Notify Admin
+        const notif = new Notification({
+            recipient: 'admin',
+            type: 'new_listing',
+            message: `New listing created: ${title}`,
+            data: { listingId: newListing._id }
+        });
+        await notif.save();
+
+        req.io.to('admin').emit('notification', {
+            ...notif.toObject(),
+            data: newListing
+        });
+
         res.status(201).json(newListing);
     } catch (error) {
         console.error('Create listing error:', error);
@@ -69,8 +85,26 @@ exports.createListing = async (req, res) => {
 
 exports.getAllListings = async (req, res) => {
     try {
-        const listings = await Listing.find().populate('vendorId', 'name email');
-        res.status(200).json(listings);
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
+
+        const totalListings = await Listing.countDocuments();
+        const listings = await Listing.find()
+            .populate('vendorId', 'name email')
+            .skip(skip)
+            .limit(limit)
+            .sort({ createdAt: -1 });
+
+        res.status(200).json({
+            listings,
+            pagination: {
+                total: totalListings,
+                page,
+                limit,
+                totalPages: Math.ceil(totalListings / limit)
+            }
+        });
     } catch (error) {
         console.error('Get all listings error:', error);
         res.status(500).json({ message: 'Server error' });
@@ -86,6 +120,35 @@ exports.getListingById = async (req, res) => {
         res.status(200).json(listing);
     } catch (error) {
         console.error('Get listing by ID error:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
+exports.getMyListings = async (req, res) => {
+    try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
+
+        const query = { vendorId: req.user._id };
+        const totalListings = await Listing.countDocuments(query);
+        const listings = await Listing.find(query)
+            .populate('vendorId', 'name email')
+            .skip(skip)
+            .limit(limit)
+            .sort({ createdAt: -1 });
+
+        res.status(200).json({
+            listings,
+            pagination: {
+                total: totalListings,
+                page,
+                limit,
+                totalPages: Math.ceil(totalListings / limit)
+            }
+        });
+    } catch (error) {
+        console.error('Get my listings error:', error);
         res.status(500).json({ message: 'Server error' });
     }
 };

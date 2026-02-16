@@ -2,10 +2,12 @@ const express = require('express');
 const router = express.Router();
 const bookingController = require('../controllers/bookingController');
 
-// TODO: Add authMiddleware
-router.post('/', bookingController.createBooking);
-router.get('/user/:userId', bookingController.getUserBookings);
-router.get('/all', bookingController.getAllBookings);
+const { protect, authorize } = require('../middleware/authMiddleware');
+
+router.post('/', protect, bookingController.createBooking);
+router.get('/vendor', protect, authorize('vendor'), bookingController.getVendorBookings);
+router.get('/user/:userId', protect, bookingController.getUserBookings);
+router.get('/all', protect, authorize('admin'), bookingController.getAllBookings);
 
 
 module.exports = router;

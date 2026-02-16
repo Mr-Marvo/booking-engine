@@ -8,14 +8,18 @@ export default function Sidebar({ isOpen, closeSidebar }) {
     const { user } = useAuth();
 
 
-    const navItems = [
-        { name: 'Dashboard', href: '/', icon: LayoutDashboard },
-        { name: 'Vendors (Admin)', href: '/vendors', icon: Store },
-        { name: 'My Listings (Vendor)', href: '/listings', icon: List },
-        { name: 'Bookings', href: '/bookings', icon: List },
-        { name: 'Reports', href: '/reports', icon: BarChart },
-        { name: 'Settings', href: '/settings', icon: Settings },
+    const allNavItems = [
+        { name: 'Dashboard', href: '/', icon: LayoutDashboard, roles: ['admin', 'vendor'] },
+        { name: 'Vendors (Admin)', href: '/vendors', icon: Store, roles: ['admin'] },
+        { name: 'My Listings', href: '/listings', icon: List, roles: ['vendor'] },
+        { name: 'All Listings', href: '/listings', icon: List, roles: ['admin'] },
+        { name: 'Bookings', href: '/bookings', icon: List, roles: ['vendor'] },
+        { name: 'Reports', href: '/reports', icon: BarChart, roles: ['admin', 'vendor'] },
+        { name: 'Settings', href: '/settings', icon: Settings, roles: ['admin', 'vendor'] },
     ];
+
+    const userRole = user?.role || 'user';
+    const navItems = allNavItems.filter(item => item.roles.includes(userRole));
 
 
     return (

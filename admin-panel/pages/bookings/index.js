@@ -18,15 +18,20 @@ export default function ViewBookings() {
 
     const fetchBookings = async () => {
         try {
-            const res = await axios.get(`${API_BASE}/bookings/all`, {
+            // We only show bookings to vendors now (Sidebar restricted)
+            // But if an Admin somehow gets here, we can either block them or show nothing.
+            // Backend /vendor route is protected for vendors only.
+
+            if (user.role !== 'vendor') {
+                // Admin shouldn't be here, but if they are, show empty or handle gracefully
+                setLoading(false);
+                return;
+            }
+
+            const res = await axios.get(`${API_BASE}/bookings/vendor`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            // Vendors only see bookings for their listings
-            if (user.role === 'vendor') {
-                setBookings(res.data.filter(b => b.listingId?.vendorId === user._id || b.listingId?.vendorId?._id === user._id));
-            } else {
-                setBookings(res.data);
-            }
+            setBookings(res.data);
         } catch (err) {
             console.error(err);
         } finally {
@@ -77,8 +82,8 @@ export default function ViewBookings() {
                                         <td className="p-5 font-black text-slate-900">${b.totalPrice}</td>
                                         <td className="p-5">
                                             <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase ${b.status === 'confirmed' ? 'bg-green-100 text-green-700' :
-                                                    b.status === 'cancelled' ? 'bg-red-100 text-red-700' :
-                                                        'bg-yellow-100 text-yellow-700'
+                                                b.status === 'cancelled' ? 'bg-red-100 text-red-700' :
+                                                    'bg-yellow-100 text-yellow-700'
                                                 }`}>
                                                 {b.status}
                                             </span>

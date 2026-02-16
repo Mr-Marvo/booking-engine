@@ -4,13 +4,13 @@ import { Popover, Transition, Switch } from '@headlessui/react';
 import { Bell, User, LogOut, Moon, Sun } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
-
-
+import { useNotification } from '../context/NotificationContext';
 
 
 export default function Header({ toggleSidebar }) {
     const { theme, toggleTheme } = useTheme();
     const { user, logout } = useAuth();
+    const { unreadCount, openDrawer } = useNotification();
 
 
     return (
@@ -31,12 +31,17 @@ export default function Header({ toggleSidebar }) {
             <div className="flex-1"></div>
 
             <div className="flex items-center gap-4">
-                <button className="relative p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                <button
+                    className="relative p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                    onClick={openDrawer}
+                >
                     <span className="sr-only">View notifications</span>
                     <Bell className="w-6 h-6" />
-                    <span className="absolute top-1.5 right-1.5 h-4 w-4 rounded-full bg-red-500 text-[10px] font-medium text-white flex items-center justify-center">
-                        1
-                    </span>
+                    {unreadCount > 0 && (
+                        <span className="absolute top-1.5 right-1.5 h-4 w-4 rounded-full bg-red-500 text-[10px] font-medium text-white flex items-center justify-center">
+                            {unreadCount}
+                        </span>
+                    )}
                 </button>
 
                 {/* Profile Dropdown */}
@@ -73,31 +78,33 @@ export default function Header({ toggleSidebar }) {
                                         </Link>
                                     </div>
 
-                                    <div className="py-1 px-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-slate-700 cursor-pointer" onClick={toggleTheme}>
-                                        <div className="flex items-center">
-                                            {theme === 'dark' ? (
-                                                <Moon className="mr-3 h-5 w-5 text-gray-400" />
-                                            ) : (
-                                                <Sun className="mr-3 h-5 w-5 text-gray-400" />
-                                            )}
-                                            <span className="text-sm text-gray-700 dark:text-gray-200">
-                                                {theme === 'dark' ? 'Dark Mode' : 'Light Mode'}
-                                            </span>
+                                    <Switch.Group>
+                                        <div className="py-1 px-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-slate-700 cursor-pointer">
+                                            <Switch.Label className="flex items-center flex-1 cursor-pointer">
+                                                {theme === 'dark' ? (
+                                                    <Moon className="mr-3 h-5 w-5 text-gray-400" />
+                                                ) : (
+                                                    <Sun className="mr-3 h-5 w-5 text-gray-400" />
+                                                )}
+                                                <span className="text-sm text-gray-700 dark:text-gray-200">
+                                                    {theme === 'dark' ? 'Dark Mode' : 'Light Mode'}
+                                                </span>
+                                            </Switch.Label>
+                                            <Switch
+                                                checked={theme === 'dark'}
+                                                onChange={toggleTheme}
+                                                className={`${theme === 'dark' ? 'bg-blue-600' : 'bg-gray-200'}
+                                                    relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
+                                            >
+                                                <span className="sr-only">Use setting</span>
+                                                <span
+                                                    aria-hidden="true"
+                                                    className={`${theme === 'dark' ? 'translate-x-5' : 'translate-x-0'}
+                                                        pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out`}
+                                                />
+                                            </Switch>
                                         </div>
-                                        <Switch
-                                            checked={theme === 'dark'}
-                                            onChange={toggleTheme}
-                                            className={`${theme === 'dark' ? 'bg-blue-600' : 'bg-gray-200'}
-                                                relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
-                                        >
-                                            <span className="sr-only">Use setting</span>
-                                            <span
-                                                aria-hidden="true"
-                                                className={`${theme === 'dark' ? 'translate-x-5' : 'translate-x-0'}
-                                                    pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out`}
-                                            />
-                                        </Switch>
-                                    </div>
+                                    </Switch.Group>
 
                                     <div className="py-1 border-t border-gray-200 dark:border-slate-700">
                                         <button
