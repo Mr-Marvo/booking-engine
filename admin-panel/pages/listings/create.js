@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
@@ -18,8 +18,7 @@ export default function CreateListing() {
         type: 'hotel',
         price: '',
         location: '',
-        vendorId: '', // For admin to select vendor
-        // Dynamic fields
+        vendorId: '',
         roomType: 'single',
         movieTitle: '',
         showTime: '',
@@ -27,8 +26,8 @@ export default function CreateListing() {
         usageType: 'event',
         vehicleType: 'car',
         capacity: '',
-        amenities: '', // Will split by comma
-        features: '' // Will split by comma
+        amenities: '',
+        features: ''
     });
 
     const [vendors, setVendors] = useState([]);

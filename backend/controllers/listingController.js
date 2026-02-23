@@ -85,12 +85,19 @@ exports.createListing = async (req, res) => {
 
 exports.getAllListings = async (req, res) => {
     try {
+        const { type } = req.query;
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
         const skip = (page - 1) * limit;
 
-        const totalListings = await Listing.countDocuments();
-        const listings = await Listing.find()
+        // Build query object
+        const query = {};
+        if (type) {
+            query.type = type;
+        }
+
+        const totalListings = await Listing.countDocuments(query);
+        const listings = await Listing.find(query)
             .populate('vendorId', 'name email')
             .skip(skip)
             .limit(limit)
