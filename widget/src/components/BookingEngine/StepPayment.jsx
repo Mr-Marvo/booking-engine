@@ -31,10 +31,6 @@ export default function StepPayment({ formData, updateFormData }) {
             imgAlt: 'Mint Pay',
             badge: null,
         },
-
-        { id: 'koko', name: 'Koko Pay', icon: <img src="/images/koko-logo.png" alt="Koko" className="w-12 h-auto" />, desc: 'Split into 3 installments' },
-        { id: 'mintpay', name: 'Mint Pay', icon: <img src="/images/mintpay-logo.png" alt="Mint Pay" className="w-16 h-auto" />, desc: 'Shop now, pay later' }
-
     ];
 
     const handleSelect = (id) => {
@@ -147,9 +143,6 @@ export default function StepPayment({ formData, updateFormData }) {
                     Select payment method
                 </div>
 
-                    </div>
-                ))}
-
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                     {paymentMethods.map(method => {
                         const isSelected = selectedMethod === method.id;
@@ -206,7 +199,6 @@ export default function StepPayment({ formData, updateFormData }) {
                 }}>
                     By continuing, you agree to our Terms of Service and Privacy Policy.
                 </p>
-
             </div>
         </div>
     );
