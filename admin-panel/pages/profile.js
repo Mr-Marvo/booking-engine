@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import AdminLayout from '../components/AdminLayout';
+
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:5000/api';
 import { useAuth } from '../context/AuthContext';
 import { User, Lock, Save, AlertCircle, CheckCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -32,7 +34,7 @@ export default function Profile() {
         e.preventDefault();
         setLoading(true);
         try {
-            const res = await fetch('http://localhost:5000/api/auth/profile', {
+            const res = await fetch(`${API_BASE}/auth/profile`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -63,7 +65,7 @@ export default function Profile() {
         }
         setLoading(true);
         try {
-            const res = await fetch('http://localhost:5000/api/auth/password', {
+            const res = await fetch(`${API_BASE}/auth/password`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',

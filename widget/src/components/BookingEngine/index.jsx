@@ -8,7 +8,7 @@ import StepListingSelection from './StepListingSelection';
 import StepBookingUI from './StepBookingUI';
 import StepPayment from './StepPayment';
 
-const API_BASE = 'http://localhost:5000/api';
+const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5000/api';
 
 const STEP_LABELS = ['Type', 'Info', 'Select', 'Book', 'Pay'];
 const TOTAL_STEPS = 5;
@@ -131,6 +131,7 @@ function BookingEngineInner() {
             if (bt === 'cinema') return !!bd?.date && (bd?.seats?.length > 0);
             return true;
         }
+        return true;
     };
 
     const handleConfirm = async () => {

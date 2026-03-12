@@ -5,7 +5,8 @@ import { useAuth } from './AuthContext';
 
 const NotificationContext = createContext();
 
-const SOCKET_URL = 'http://localhost:5000';
+const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:5000';
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:5000/api';
 
 export const NotificationProvider = ({ children }) => {
     const { user, token } = useAuth(); // Assuming 'token' is available in useAuth
@@ -17,7 +18,7 @@ export const NotificationProvider = ({ children }) => {
     const fetchNotifications = async () => {
         if (!user || !token) return;
         try {
-            const res = await fetch('http://localhost:5000/api/notifications', {
+            const res = await fetch(`${API_BASE}/notifications`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             const data = await res.json();
@@ -93,7 +94,7 @@ export const NotificationProvider = ({ children }) => {
                 n._id === id ? { ...n, read: true } : n
             ));
 
-            await fetch(`http://localhost:5000/api/notifications/${id}/read`, {
+            await fetch(`${API_BASE}/notifications/${id}/read`, {
                 method: 'PUT',
                 headers: { Authorization: `Bearer ${token}` }
             });
@@ -107,7 +108,7 @@ export const NotificationProvider = ({ children }) => {
         try {
             setNotifications(prev => prev.map(n => ({ ...n, read: true })));
 
-            await fetch('http://localhost:5000/api/notifications/read-all', {
+            await fetch(`${API_BASE}/notifications/read-all`, {
                 method: 'PUT',
                 headers: { Authorization: `Bearer ${token}` }
             });
@@ -121,7 +122,7 @@ export const NotificationProvider = ({ children }) => {
         try {
             setNotifications([]);
 
-            await fetch('http://localhost:5000/api/notifications', {
+            await fetch(`${API_BASE}/notifications`, {
                 method: 'DELETE',
                 headers: { Authorization: `Bearer ${token}` }
             });
