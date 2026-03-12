@@ -41,7 +41,9 @@ export default function Dashboard() {
       });
       setStats(res.data);
     } catch (err) {
-      console.error(err);
+      if (err.response?.status !== 401) {
+        console.error('Failed to fetch stats:', err);
+      }
     }
   };
 
@@ -53,7 +55,9 @@ export default function Dashboard() {
       });
       setActivities(res.data.activities || []);
     } catch (err) {
-      console.error('Failed to fetch activities:', err);
+      if (err.response?.status !== 401) {
+        console.error('Failed to fetch activities:', err);
+      }
     } finally {
       setLoadingActivities(false);
     }

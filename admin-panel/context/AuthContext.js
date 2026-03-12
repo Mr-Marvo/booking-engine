@@ -16,15 +16,21 @@ export const AuthProvider = ({ children }) => {
 
         if (storedToken && storedUser) {
             try {
-                setToken(storedToken);
-                const parsedUser = JSON.parse(storedUser);
-                // Ensure _id exists for consistency
-                if (parsedUser && parsedUser.id && !parsedUser._id) {
-                    parsedUser._id = parsedUser.id;
+                const payload = JSON.parse(atob(storedToken.split('.')[1]));
+                if (payload.exp * 1000 < Date.now()) {
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('user');
+                } else {
+                    setToken(storedToken);
+                    const parsedUser = JSON.parse(storedUser);
+                    // Ensure _id exists for consistency
+                    if (parsedUser && parsedUser.id && !parsedUser._id) {
+                        parsedUser._id = parsedUser.id;
+                    }
+                    setUser(parsedUser);
                 }
-                setUser(parsedUser);
             } catch (e) {
-                console.error("Error parsing stored user:", e);
+                console.error("Error parsing stored user or token:", e);
                 localStorage.removeItem('user');
                 localStorage.removeItem('token');
             }
@@ -73,6 +79,39 @@ export const AuthProvider = ({ children }) => {
             };
         }
     };
+
+    useEffect(() => {
+        const interceptor = axios.interceptors.response.use(
+            (response) => response,
+            (error) => {
+                if (error.response && error.response.status === 401) {
+                    logout();
+                }
+                return Promise.reject(error);
+            }
+        );
+        return () => axios.interceptors.response.eject(interceptor);
+    }, []);
+
+    useEffect(() => {
+        if (token) {
+            try {
+                const payload = JSON.parse(atob(token.split('.')[1]));
+                const timeRemaining = payload.exp * 1000 - Date.now();
+                // Check if timeRemaining is within max 32-bit int bounds for setTimeout
+                if (timeRemaining > 0 && timeRemaining <= 2147483647) {
+                    const timer = setTimeout(() => {
+                        logout();
+                    }, timeRemaining);
+                    return () => clearTimeout(timer);
+                } else if (timeRemaining <= 0) {
+                    logout();
+                }
+            } catch (e) {
+                console.error("Error setting auto-logout timer:", e);
+            }
+        }
+    }, [token]);
 
     const logout = () => {
         setToken(null);
